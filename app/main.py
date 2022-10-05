@@ -21,7 +21,8 @@ async def post_links(links: VisitedLinks):
     cur_time = int(datetime.now().timestamp())
     print(cur_time)
     print(links)
-    await redis.set('links', f"{str(links)}:{str(cur_time)}")
+    # await redis.set('links', f"{str(links)}:{str(cur_time)}")
+    await redis.set(str(cur_time), str(links))
     result = await redis.get('links')
     print(result)
     return {"status": "ok"}
@@ -31,10 +32,9 @@ async def post_links(links: VisitedLinks):
 async def read_item(request: Request):
     from_timestamp = request.query_params["from"]
     to_timestamp = request.query_params["to"]
-    print(request.query_params["to"])
+    # print(request.query_params["to"])
     result = await redis.get('links')
     print(result)
-    
     return {"from": from_timestamp, "to": to_timestamp}
 
 
