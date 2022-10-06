@@ -38,7 +38,7 @@ def get_domains(request: Request):
         except Exception as e:
             response["status"] = str(e)
     print(response)
-    return {"from": from_timestamp, "to": to_timestamp}
+    return response
 
 
 
