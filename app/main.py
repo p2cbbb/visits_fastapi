@@ -37,7 +37,6 @@ def get_domains(request: Request):
                 response["status"] = "ok"
         except Exception as e:
             response["status"] = str(e)
-    print(response)
     return response
 
 
