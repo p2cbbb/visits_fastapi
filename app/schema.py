@@ -3,7 +3,7 @@ from redis_om import HashModel
 from config import redis_db
 
 class VisitedLinks(BaseModel):
-    lnks: list
+    links: list
 
     class Meta:
         database: redis_db

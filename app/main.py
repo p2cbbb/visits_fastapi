@@ -1,14 +1,13 @@
-from urllib.request import Request
-import aioredis
+
+import redis
 from datetime import datetime
-
+from urllib.request import Request
 from fastapi import FastAPI, Request, status
-from typing import Union
-
 from schema import VisitedLinks
 
 app = FastAPI()
-redis = aioredis.from_url('redis://localhost:6379', encoding='utf-8', decode_responses=True)
+redis = redis.StrictRedis(host='localhost', port=6379, db=0, charset="utf-8", decode_responses=True)
+# redis = aioredis.from_url('redis://localhost:6379', encoding='utf-8', decode_responses=True)
 
 
 @app.get('/')
@@ -17,24 +16,34 @@ async def Home():
 
 
 @app.post("/visited_links", status_code=status.HTTP_201_CREATED)
-async def post_links(links: VisitedLinks):
+def post_links(links: VisitedLinks):
     cur_time = int(datetime.now().timestamp())
-    print(cur_time)
-    print(links)
-    # await redis.set('links', f"{str(links)}:{str(cur_time)}")
-    await redis.set(str(cur_time), str(links))
-    result = await redis.get('links')
-    print(result)
+    visited_links = {}
+    # for link in links.links:
+    #     domains.add(link)
+    #     visited_links[cur_time] = link
+    #     print(link)
+    visited_links[cur_time] = str(links.links)
+    redis.mset(visited_links)
+    print(visited_links)
     return {"status": "ok"}
 
 
 @app.get("/visited_domains", status_code=status.HTTP_200_OK)
-async def read_item(request: Request):
+def get_domains(request: Request):
     from_timestamp = request.query_params["from"]
     to_timestamp = request.query_params["to"]
-    # print(request.query_params["to"])
-    result = await redis.get('links')
-    print(result)
+    range_timestamp = list(range(int(from_timestamp), int(to_timestamp)))
+    # print(range_timestamp)
+    for t in range_timestamp:
+        try:
+            res = redis.mget(t)
+            if res != [None]:
+                print(res)
+        except Exception as e:
+            continue
+    # result = redis.mget('')
+    # print(result)
     return {"from": from_timestamp, "to": to_timestamp}
 
 
