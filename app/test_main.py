@@ -25,7 +25,6 @@ def test_get_domains():
         f"/visited_domains?from={cur_time-1}&to={cur_time+1}",
         headers={"X-Token": "coneofsilence"}
     )
-    domains = ["ya.ru", "funbox.ru", "stackoverflow.com"]
     assert response.status_code == 200
     assert response.json()["status"] == "ok"
     assert "stackoverflow.com" and "funbox.ru" and "ya.ru" in response.json()["domains"]
