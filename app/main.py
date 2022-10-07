@@ -3,8 +3,8 @@ from datetime import datetime
 from urllib.request import Request
 from fastapi import FastAPI, Request, status
 
-from app.schema import VisitedLinks
-from app.utils import extract_domain_from_url
+from schema import VisitedLinks
+from utils import extract_domain_from_url
 
 app = FastAPI()
 redis = redis.StrictRedis(host='localhost', port=6379, db=0, charset="utf-8", decode_responses=True)

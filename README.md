@@ -15,7 +15,7 @@ pip install -r requirements.txt
  
 ```bash
 cd app
-pytest
+python -m pytest test_main.py
 ```
 
 ### Запуск redis-сервера

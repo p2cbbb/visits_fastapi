@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from redis_om import HashModel
 
-from app.config import redis_db
+from config import redis_db
 
 
 class VisitedLinks(BaseModel):
