@@ -7,7 +7,7 @@
 git clone https://github.com/p2cbbb/visits_fastapi
 cd visits_fastapi
 virtualenv venv
-venv/bin/activate
+source venv/bin/activate
 pip install -r requirements.txt
 ```
 
