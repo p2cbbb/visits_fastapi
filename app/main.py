@@ -21,7 +21,8 @@ def post_links(links: VisitedLinks):
     # for add data into redis db
     visited_links[cur_time] = "*".join(domains)
     pipeline.mset(visited_links)
-    print(visited_links)
+    pipeline.execute()
+    print(cur_time)
     return {"status": "ok"}
 
 
@@ -35,20 +36,19 @@ def get_domains(request: Request):
     # then create a list with integers between these values
     from_timestamp = request.query_params["from"]
     to_timestamp = request.query_params["to"]
-    range_timestamp = list(range(int(from_timestamp), int(to_timestamp)))
-    # let's go through the list of timestamps and if it has domains
+    redis_keys = redis.keys()
+    # let's go through the list of keys and if it between timestamps
     # add them into the template response
-    for time_int in range_timestamp:
-        try:
-            pipeline.mget(time_int)
-            domains = pipeline.execute()
-            result_domains = domains[-1][0]
-            if result_domains != None:
-                # add domain into domains list
-                response["domains"].append(result_domains.split("*")[0])
+    try:
+        for key in redis_keys:
+            if key >= from_timestamp and key <= to_timestamp:
+                pipeline.mget(key)
+                domains = pipeline.execute()[0]
+                result_domains = domains[0].split("*")
+                response["domains"] = result_domains
                 response["status"] = "ok"
-        except Exception as e:
-            response["status"] = str(e)
+    except Exception as e:
+        response["status"] = str(e)
     return response
 
 
