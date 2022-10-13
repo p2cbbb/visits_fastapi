@@ -8,7 +8,7 @@ from utils import extract_domain_from_url
 
 app = FastAPI()
 redis = redis.StrictRedis(host='localhost', port=6379, db=0, charset="utf-8", decode_responses=True)
-
+pipeline = redis.pipeline()
 
 
 @app.post("/visited_links", status_code=status.HTTP_201_CREATED)
@@ -20,8 +20,8 @@ def post_links(links: VisitedLinks):
     # convert set into string and devide it by "*"
     # for add data into redis db
     visited_links[cur_time] = "*".join(domains)
-    redis.mset(visited_links)
-    # print(visited_links)
+    pipeline.mset(visited_links)
+    print(visited_links)
     return {"status": "ok"}
 
 
@@ -40,9 +40,12 @@ def get_domains(request: Request):
     # add them into the template response
     for time_int in range_timestamp:
         try:
-            domains = redis.mget(time_int)
-            if domains != [None]:
-                response["domains"] = domains[0].split("*")
+            pipeline.mget(time_int)
+            domains = pipeline.execute()
+            result_domains = domains[-1][0]
+            if result_domains != None:
+                # add domain into domains list
+                response["domains"].append(result_domains.split("*")[0])
                 response["status"] = "ok"
         except Exception as e:
             response["status"] = str(e)
